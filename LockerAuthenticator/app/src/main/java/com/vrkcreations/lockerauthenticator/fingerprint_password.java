@@ -117,7 +117,7 @@ public class fingerprint_password extends AppCompatActivity {
             startActivity(new Intent(this, fingerprint_password.class));
         } else {
             fingerprintActivityData = gson.fromJson(sharedPreferences.getString(data_key, gson.toJson(new Fingerprint_activity_data())), Fingerprint_activity_data.class);
-            if (!fingerprintActivityData.getPassword_set()) {
+            if (fingerprintActivityData.getPassword_set()) {
 
             }
         }
