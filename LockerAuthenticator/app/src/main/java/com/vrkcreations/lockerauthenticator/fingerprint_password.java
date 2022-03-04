@@ -54,8 +54,6 @@ public class fingerprint_password extends AppCompatActivity {
     EditText primary_password_edittext;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +70,8 @@ public class fingerprint_password extends AppCompatActivity {
 
         biometricPrompt.authenticate(promptInfo);
 
+        fingerprintActivityData.clean();
+
 
     }
 
@@ -83,6 +83,15 @@ public class fingerprint_password extends AppCompatActivity {
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 Toast.makeText(getApplicationContext(), errorCode + ":" + errString, Toast.LENGTH_LONG).show();
+
+                switch (errorCode) {
+                    case 5:
+                        startActivity(new Intent(getApplicationContext(), fingerprint_password.class));
+                        break;
+                    case 13:
+                        finish();
+                        break;
+                }
 
             }
 
@@ -132,14 +141,19 @@ public class fingerprint_password extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length()<8){
+                if (charSequence.length() < 8) {
                     primary_password_edittext.setError("Minimum password length is 8");
                     authenticate_button.setVisibility(View.INVISIBLE);
-                }else {
+                } else {
                     primary_password_edittext.setError(null);
-                    if(auth_type_textview.getText().toString().equals("LOGIN")){
-                        authenticate_button.setVisibility(View.VISIBLE);
-                        hideKeyboard(fingerprint_password.this);
+                    if (auth_type_textview.getText().toString().equals("LOGIN")) {
+                        if (charSequence.length() == fingerprintActivityData.get_password_length()) {
+                            authenticate_button.setVisibility(View.VISIBLE);
+                            hideKeyboard(fingerprint_password.this);
+                        } else {
+                            authenticate_button.setVisibility(View.INVISIBLE);
+                        }
+
                     }
 
                 }
@@ -159,13 +173,13 @@ public class fingerprint_password extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(primary_password_edittext.getError()!=null){
+                if (primary_password_edittext.getError() != null) {
                     secondary_password_edittext.setError("rule violation in password field");
                     authenticate_button.setVisibility(View.INVISIBLE);
-                }else if(!primary_password_edittext.getText().toString().equals(secondary_password_edittext.getText().toString())){
+                } else if (!primary_password_edittext.getText().toString().equals(secondary_password_edittext.getText().toString())) {
                     secondary_password_edittext.setError("Re-entered password should match original one");
                     authenticate_button.setVisibility(View.INVISIBLE);
-                }else{
+                } else {
                     secondary_password_edittext.setError(null);
                     authenticate_button.setVisibility(View.VISIBLE);
                     hideKeyboard(fingerprint_password.this);
@@ -178,65 +192,111 @@ public class fingerprint_password extends AppCompatActivity {
             }
         });
 
+        authenticate_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fingerprint_activity_data.authcode code;
+                if (auth_type_textview.getText().toString().equals("LOGIN")) {
+                    code = fingerprintActivityData.authenticate(primary_password_edittext.getText().toString());
+                    switch (code) {
+                        case AUTHENTICATED:
+                            toast("welcome to authenticator", Toast.LENGTH_LONG);
+                            break;
+                        case FAILURE:
+                            toast("Wrong password, Try again", Toast.LENGTH_SHORT);
+                            break;
+                        case MAX_RETRIES:
+                            toast("max retries , please re authenticate", Toast.LENGTH_LONG);
+                            fingerprintActivityData.clean();
+                            finish();
+                            break;
+                    }
+                } else {
+                    code = fingerprintActivityData.setPassword(primary_password_edittext.getText().toString());
+                    switch (code) {
+                        case REGISTERED:
+                            toast("congratulation you have registered", Toast.LENGTH_SHORT);
+                            saveofflinedata(fingerprintActivityData);
+                            startActivity(new Intent(getApplicationContext(), fingerprint_password.class));
+                            break;
+                        default:
+                            toast("something went wrong", Toast.LENGTH_LONG);
+                            break;
+                    }
+                }
+            }
+        });
+
+        findViewById(R.id.authflip_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fingerprintActivityData.setPassword_set(!fingerprintActivityData.getPassword_set());
+                saveofflinedata(fingerprintActivityData);
+                startActivity(new Intent(getApplicationContext(), fingerprint_password.class));
+            }
+        });
+
     }
 
     private void init() {
         sharedPreferences = getSharedPreferences(shared_preferences_key, MODE_PRIVATE);
         offline_data = sharedPreferences.edit();
 
+
         if (!sharedPreferences.contains(data_key)) {
-            offline_data.putString(data_key, gson.toJson(new Fingerprint_activity_data()));
-            offline_data.commit();
+            saveofflinedata(new Fingerprint_activity_data());
             startActivity(new Intent(this, fingerprint_password.class));
         } else {
             fingerprintActivityData = gson.fromJson(sharedPreferences.getString(data_key, gson.toJson(new Fingerprint_activity_data())), Fingerprint_activity_data.class);
             if (fingerprintActivityData.getPassword_set()) {
                 setviewvisiblity("login");
-            }else{
+            } else {
                 setviewvisiblity("register");
+                authenticate_button.setVisibility(View.INVISIBLE);
             }
         }
 
     }
 
-    private void init_views(){
-        authenticate_button=findViewById(R.id.authenticate_button);
-        show_password_button=findViewById(R.id.show_password_button);
-        control_button=findViewById(R.id.control_button);
-        secondary_password_indicator_textview=findViewById(R.id.secondary_password_indicator_textview);
-        primary_password_indicator_textview=findViewById(R.id.primary_password_indicator_textview);
-        auth_type_textview=findViewById(R.id.password_mode_indicator_textview);
-        secondary_password_edittext=findViewById(R.id.secondary_password_edittext);
-        primary_password_edittext=findViewById(R.id.primary_password_edittext);
+    private void init_views() {
+        authenticate_button = findViewById(R.id.authenticate_button);
+        show_password_button = findViewById(R.id.show_password_button);
+        control_button = findViewById(R.id.control_button);
+        secondary_password_indicator_textview = findViewById(R.id.secondary_password_indicator_textview);
+        primary_password_indicator_textview = findViewById(R.id.primary_password_indicator_textview);
+        auth_type_textview = findViewById(R.id.password_mode_indicator_textview);
+        secondary_password_edittext = findViewById(R.id.secondary_password_edittext);
+        primary_password_edittext = findViewById(R.id.primary_password_edittext);
     }
 
-    private void setviewvisiblity(String type){
+    private void setviewvisiblity(String type) {
 
-        if(type.equals("login")){
+        if (type.equals("login")) {
             auth_type_textview.setText("LOGIN");
             secondary_password_edittext.setVisibility(View.GONE);
             secondary_password_indicator_textview.setVisibility(View.GONE);
             authenticate_button.setText("LOGIN");
-            show_password_button.setText("SHOW PASSWORD");
-        }else if(type.equals("register")){
+        } else if (type.equals("register")) {
             auth_type_textview.setText("REGISTER");
             secondary_password_edittext.setVisibility(View.VISIBLE);
             secondary_password_indicator_textview.setVisibility(View.VISIBLE);
             authenticate_button.setText("REGISTER");
-            show_password_button.setText("SHOW PASSWORD");
         }
+        show_password_button.setText("SHOW PASSWORD");
 
 
     }
 
-    public void change_show_password(View v){
-        if(show_password_button.getText().equals("HIDE PASSWORD")){
+    public void change_show_password(View v) {
+        if (show_password_button.getText().equals("HIDE PASSWORD")) {
             primary_password_edittext.setTransformationMethod(PasswordTransformationMethod.getInstance());
-            secondary_password_edittext.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            if (auth_type_textview.getText().equals("REGISTER"))
+                secondary_password_edittext.setTransformationMethod(PasswordTransformationMethod.getInstance());
             show_password_button.setText("SHOW PASSWORD");
-        }else{
+        } else {
             primary_password_edittext.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-            secondary_password_edittext.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            if (auth_type_textview.getText().equals("REGISTER"))
+                secondary_password_edittext.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
             show_password_button.setText("HIDE PASSWORD");
         }
 
@@ -256,5 +316,11 @@ public class fingerprint_password extends AppCompatActivity {
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    private void saveofflinedata(Fingerprint_activity_data data) {
+        offline_data.putString(data_key, gson.toJson(data));
+        offline_data.commit();
+    }
+
 
 }
