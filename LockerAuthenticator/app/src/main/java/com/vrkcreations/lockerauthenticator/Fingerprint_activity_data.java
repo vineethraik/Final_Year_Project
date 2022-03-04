@@ -1,15 +1,20 @@
 package com.vrkcreations.lockerauthenticator;
 
+import android.util.Log;
+import android.widget.Toast;
+
 public class Fingerprint_activity_data {
     public enum authcode{
         AUTHENTICATED ,
         FAILURE,
-        MAX_RETRIES
+        MAX_RETRIES,
+        REGISTERED
     }
 
-    private Boolean password_set=false;
+    private boolean password_set=false;
     private String password;
     private int failed_try_count=0;
+    public int maxtries=3;
 
     public void clean(){
         failed_try_count=0;
@@ -19,25 +24,33 @@ public class Fingerprint_activity_data {
         return password_set;
     }
 
-    public void setPassword_set(Boolean password_set) {
-        this.password_set = password_set;
+    public int get_password_length(){return password.length();}
+
+    public void setPassword_set(boolean password_set){
+        this.password_set=password_set;
     }
 
-    public void setPassword(String password) {
+    public authcode setPassword(String password) {
         this.password = password;
+        password_set=true;
+        return authcode.REGISTERED;
     }
 
     public authcode authenticate(String password){
-        if(this.password==password){
+
+        if(this.password.equals(password)){
+
             return authcode.AUTHENTICATED;
         }
         else{
             failed_try_count++;
-            if(failed_try_count<=3){
+            if(failed_try_count>=maxtries){
                 return authcode.MAX_RETRIES;
             }
             return authcode.FAILURE;
         }
 
     }
+
+
 }
