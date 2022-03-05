@@ -30,9 +30,6 @@ import java.util.concurrent.Executor;
 
 public class fingerprint_password extends AppCompatActivity {
 
-    private final String data_key = "Fingerprint_activity_data";
-    private final String shared_preferences_key = "Offline_data";
-
     private Executor executor_login;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
@@ -43,7 +40,7 @@ public class fingerprint_password extends AppCompatActivity {
 
     Gson gson = new Gson();
 
-    Fingerprint_activity_data fingerprintActivityData = null;
+    Fingerprint_activity_data fingerprintActivityData = new Fingerprint_activity_data();
     Button show_password_button;
     Button authenticate_button;
     Button control_button;
@@ -200,7 +197,8 @@ public class fingerprint_password extends AppCompatActivity {
                     code = fingerprintActivityData.authenticate(primary_password_edittext.getText().toString());
                     switch (code) {
                         case AUTHENTICATED:
-                            toast("welcome to authenticator", Toast.LENGTH_LONG);
+                            toast("Authenticated", Toast.LENGTH_LONG);
+                            startActivity(new Intent(getApplicationContext(),detailed_registration.class));
                             break;
                         case FAILURE:
                             toast("Wrong password, Try again", Toast.LENGTH_SHORT);
@@ -239,15 +237,15 @@ public class fingerprint_password extends AppCompatActivity {
     }
 
     private void init() {
-        sharedPreferences = getSharedPreferences(shared_preferences_key, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(fingerprintActivityData.shared_preferences_key, MODE_PRIVATE);
         offline_data = sharedPreferences.edit();
 
 
-        if (!sharedPreferences.contains(data_key)) {
+        if (!sharedPreferences.contains(fingerprintActivityData.shared_preferences_data_key)) {
             saveofflinedata(new Fingerprint_activity_data());
             startActivity(new Intent(this, fingerprint_password.class));
         } else {
-            fingerprintActivityData = gson.fromJson(sharedPreferences.getString(data_key, gson.toJson(new Fingerprint_activity_data())), Fingerprint_activity_data.class);
+            fingerprintActivityData = gson.fromJson(sharedPreferences.getString(fingerprintActivityData.shared_preferences_data_key, gson.toJson(new Fingerprint_activity_data())), Fingerprint_activity_data.class);
             if (fingerprintActivityData.getPassword_set()) {
                 setviewvisiblity("login");
             } else {
@@ -282,6 +280,7 @@ public class fingerprint_password extends AppCompatActivity {
             secondary_password_indicator_textview.setVisibility(View.VISIBLE);
             authenticate_button.setText("REGISTER");
         }
+        authenticate_button.setVisibility(View.INVISIBLE);
         show_password_button.setText("SHOW PASSWORD");
 
 
@@ -318,7 +317,7 @@ public class fingerprint_password extends AppCompatActivity {
     }
 
     private void saveofflinedata(Fingerprint_activity_data data) {
-        offline_data.putString(data_key, gson.toJson(data));
+        offline_data.putString(fingerprintActivityData.shared_preferences_data_key, gson.toJson(data));
         offline_data.commit();
     }
 

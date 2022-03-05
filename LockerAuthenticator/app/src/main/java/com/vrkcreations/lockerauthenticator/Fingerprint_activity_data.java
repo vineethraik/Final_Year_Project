@@ -4,6 +4,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Fingerprint_activity_data {
+    public final String shared_preferences_data_key = "Fingerprint_activity_data";
+    public final String shared_preferences_key = "Offline_data";
+
     public enum authcode{
         AUTHENTICATED ,
         FAILURE,
