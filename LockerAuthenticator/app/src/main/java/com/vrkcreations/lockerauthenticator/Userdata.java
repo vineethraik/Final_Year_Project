@@ -1,5 +1,7 @@
 package com.vrkcreations.lockerauthenticator;
 
+import androidx.annotation.NonNull;
+
 public class Userdata {
     public final String shared_preferences_data_key = "User_data";
     public final String shared_preferences_key = "Offline_data";
@@ -69,6 +71,10 @@ public class Userdata {
         Id = id;
     }
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        return "name:"+getName()+";nickname:"+getNickname()+";phone:"+getPhone()+";mail:"+getEmail()+";registered:"+isRegistered();
+    }
 }
 
