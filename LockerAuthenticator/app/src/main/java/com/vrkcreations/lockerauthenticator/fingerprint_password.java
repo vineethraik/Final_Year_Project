@@ -41,6 +41,7 @@ public class fingerprint_password extends AppCompatActivity {
     Gson gson = new Gson();
 
     Fingerprint_activity_data fingerprintActivityData = new Fingerprint_activity_data();
+    Functions functions = new Functions();
     Button show_password_button;
     Button authenticate_button;
     Button control_button;
@@ -82,10 +83,20 @@ public class fingerprint_password extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), errorCode + ":" + errString, Toast.LENGTH_LONG).show();
 
                 switch (errorCode) {
-                    case 5:
+
+                    case BiometricPrompt.ERROR_CANCELED:
                         startActivity(new Intent(getApplicationContext(), fingerprint_password.class));
                         break;
-                    case 13:
+                    case BiometricPrompt.ERROR_HW_UNAVAILABLE:
+                    case BiometricPrompt.ERROR_HW_NOT_PRESENT:
+                    case BiometricPrompt.ERROR_NEGATIVE_BUTTON:
+                    case BiometricPrompt.ERROR_USER_CANCELED:
+                    case BiometricPrompt.ERROR_NO_BIOMETRICS:
+                    case BiometricPrompt.ERROR_VENDOR:
+                    case BiometricPrompt.ERROR_LOCKOUT:
+                    case BiometricPrompt.ERROR_UNABLE_TO_PROCESS:
+                    case BiometricPrompt.ERROR_SECURITY_UPDATE_REQUIRED:
+                    case BiometricPrompt.ERROR_NO_SPACE:
                         finish();
                         break;
                 }
@@ -146,7 +157,7 @@ public class fingerprint_password extends AppCompatActivity {
                     if (auth_type_textview.getText().toString().equals("LOGIN")) {
                         if (charSequence.length() == fingerprintActivityData.get_password_length()) {
                             authenticate_button.setVisibility(View.VISIBLE);
-                            hideKeyboard(fingerprint_password.this);
+                            functions.hideKeyboard(fingerprint_password.this);
                         } else {
                             authenticate_button.setVisibility(View.INVISIBLE);
                         }
@@ -179,7 +190,7 @@ public class fingerprint_password extends AppCompatActivity {
                 } else {
                     secondary_password_edittext.setError(null);
                     authenticate_button.setVisibility(View.VISIBLE);
-                    hideKeyboard(fingerprint_password.this);
+                    functions.hideKeyboard(fingerprint_password.this);
                 }
             }
 
@@ -198,7 +209,7 @@ public class fingerprint_password extends AppCompatActivity {
                     switch (code) {
                         case AUTHENTICATED:
                             toast("Authenticated", Toast.LENGTH_LONG);
-                            startActivity(new Intent(getApplicationContext(),detailed_registration.class));
+                            startActivity(new Intent(getApplicationContext(), detailed_registration.class));
                             break;
                         case FAILURE:
                             toast("Wrong password, Try again", Toast.LENGTH_SHORT);
@@ -305,16 +316,6 @@ public class fingerprint_password extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), message, length).show();
     }
 
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
 
     private void saveofflinedata(Fingerprint_activity_data data) {
         offline_data.putString(fingerprintActivityData.shared_preferences_data_key, gson.toJson(data));
