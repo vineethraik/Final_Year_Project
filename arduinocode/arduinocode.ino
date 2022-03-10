@@ -2,8 +2,9 @@
 
 
 #include "libs.h"
-
-
+#include <sstream>
+#include<vector>
+using namespace std;
 const unsigned char logo2 [] PROGMEM = {
   // 'logo2, 41x41px
   0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0xbf, 0xff, 0xff, 0xff,
@@ -217,11 +218,15 @@ void setup() {
   oled.display();
   Serial.begin(9600);
   oled.clearDisplay();
-  Serial.print("hi");
+  Serial.println("hi");
+
+  
   text(1000);
   logo(5000);
   faceshow(10000);
   while (true)delay(1);
+
+  
 
 }
 

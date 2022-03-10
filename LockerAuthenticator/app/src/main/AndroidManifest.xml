@@ -15,7 +15,7 @@
         <activity
             android:name=".detailed_registration"
             android:exported="false"
-            android:noHistory="true"
+            android:noHistory="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
@@ -40,7 +40,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:noHistory="true"
+            android:noHistory="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
     </application>
