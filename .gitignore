@@ -85,3 +85,14 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+
+# Arduino custom gitignore
+credentials.h
+experiment.ino
+bitmaps.h
+codedump.ino
+
+
+#vscode
+.vscode
