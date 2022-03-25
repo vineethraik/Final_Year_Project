@@ -109,7 +109,7 @@ public class detailed_registration extends AppCompatActivity {
         }
 
         userdata = gson.fromJson(sharedPreferences.getString(userdata.shared_preferences_data_key, gson.toJson(new Userdata())), Userdata.class);
-        Log.d("test","inputing:--"+userdata.toString());
+        Log.d("test","inputting:--"+userdata.toString());
         if (userdata.isRegistered()) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();

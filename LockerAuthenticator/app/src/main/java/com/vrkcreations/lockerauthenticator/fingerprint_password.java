@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
@@ -242,6 +243,14 @@ public class fingerprint_password extends AppCompatActivity {
                 fingerprintActivityData.setPassword_set(!fingerprintActivityData.getPassword_set());
                 saveofflinedata(fingerprintActivityData);
                 startActivity(new Intent(getApplicationContext(), fingerprint_password.class));
+            }
+        });
+
+        findViewById(R.id.control_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SmsManager smsManager=SmsManager.getDefault();
+                smsManager.sendTextMessage("7337688347", null, "from a app", null, null);
             }
         });
 
