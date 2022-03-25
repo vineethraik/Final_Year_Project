@@ -1,5 +1,3 @@
-#define OTA_h
-
 #include"libs.h"
 
 
@@ -14,22 +12,32 @@ class OTA{
 void OTA::init(){
     ArduinoOTA.onStart([]() {
     disp.clear();
-    disp.println("Started Uploading");
+    disp.println("Started Downloading");
     disp.progress=true;
   });
 
   ArduinoOTA.onEnd([]() {
     disp.progress=false;
     disp.clear();
-    disp.println("Upload completed");
+    disp.println("Download completed");
     delay(1000);
   });
 
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    
+    disp.oled.clearDisplay();
+    disp.oled.setCursor(0, 0);
+    disp.oled.print("total bytes:");
+    disp.oled.print(total);
+    disp.oled.print("\n\nBytes downloaded:\n");
+    disp.oled.print(progress);
+    disp.oled.print("\n\nDownloading:");
+    disp.oled.print((progress*100)/total);
+    disp.oled.print("\%");
+    disp.oled.display();
   });
 
   ArduinoOTA.onError([](ota_error_t error) {
+    disp.progress=false;
       disp.clear();
     disp.println("Error["+String(error)+"]: ");
     if (error == OTA_AUTH_ERROR) {
@@ -49,4 +57,5 @@ void OTA::init(){
 
 void OTA::handle(){
     ArduinoOTA.handle();
+    delay(1);
 }
