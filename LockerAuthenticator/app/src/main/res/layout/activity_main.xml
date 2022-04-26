@@ -4,5 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:visibility="visible"/>
+    android:visibility="visible"
+    tools:context=".MainActivity">
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_new_device_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98"
+        app:maxImageSize="60dp"
+        tools:ignore="MissingConstraints,SpeakableTextPresentCheck" />
+
+    <ListView
+       android:id="@+id/device_listview"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        tools:listitem="@layout/device_view"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
