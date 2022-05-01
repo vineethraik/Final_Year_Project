@@ -4,7 +4,8 @@
 WiFiUDP ntpUDP;
 static NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800, 60000);
 
-class Time{
+    class Time
+           {
   private:
   function<void(void)> update=nullptr;
   DS1307 RTC;
@@ -14,6 +15,7 @@ class Time{
   String gettime();
   void print();
   void update_time(int,int,int);
+  void update_date(int,int,int,int);
   void addupdatefunction(function<void(void)>);
 }TIME;
 
@@ -82,6 +84,15 @@ void Time::update_time(int hour,int min,int sec){
   RTC.setSeconds(sec);
 }
 
+void Time::update_date(int day,int month,int year,int week=-1){
+  RTC.setYear(year);
+  RTC.setMonth(month);
+  RTC.setDay(day);
+  if(week>=0){
+    RTC.setWeek(week+1);
+  }
+}
+
 void Time::addupdatefunction(function<void(void)> fn){
-update=fn;
+  update=fn;
 }

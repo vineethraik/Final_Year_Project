@@ -10,7 +10,10 @@ class OTA{
 }ota;
 
 void OTA::init(){
-    ArduinoOTA.onStart([]() {
+
+  
+  ArduinoOTA.setPasswordHash("4a1e307fbe9fc730bbb117b5c4d27342");
+  ArduinoOTA.onStart([]() {
     disp.clear();
     disp.println("Started Downloading");
     disp.progress=true;

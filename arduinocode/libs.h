@@ -23,6 +23,8 @@
 
 #include <ESP8266WiFi.h>
 
+#include <ESP8266WebServer.h>
+
 #include <WiFiManager.h>
 
 #include <ESP8266mDNS.h>
@@ -42,6 +44,13 @@
 #include <RTC.h>
 #define RTC_h
 #endif
+
+class Locker ;
+class OTA;
+class connectivity;
+class input;
+class time;
+class display;
 
 #ifndef locker_h
 #define locker_h
@@ -71,6 +80,11 @@
 #ifndef display_h
 #define display_h
 #include"display.h"
+#endif
+
+#ifndef utlity_h
+#define utility_h
+#include"utility.h"
 #endif
 
 #ifndef bitmaps_h

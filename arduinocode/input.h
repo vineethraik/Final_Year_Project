@@ -2,18 +2,20 @@
 
 class screen;
 
-#define BACK_pin 1
+#define BACK_pin 0
 #define OK_pin 2
-#define UP_pin 3
-#define DOWN_pin 0
+#define UP_pin 1
+#define DOWN_pin 3
+
+const int keypad_pins[7]{6,5,4,3,2,1,0};
 
 class input {
-private:
+  private:
   function<void(void)> update = nullptr;
   PCF8574 io1;
   PCF8574 io2;
 
-public:
+  public:
   input();
   input(char, char);
   enum state { BACK,
@@ -23,10 +25,12 @@ public:
                NILL };
 
   state read_switch();
-  bool check_back();
+  bool check_back(bool);
   bool check_ok();
   bool check_down();
   bool check_up();
+  bool check_down(int);
+  bool check_up(int);
   String read_pin(int);
   String read_number();
   void addupdatefunction(function<void(void)>);
@@ -76,8 +80,9 @@ input::state input::read_switch() {
   }
 }
 
-bool input::check_back(){
+bool input::check_back(bool wait=true){
   if(io2.read(BACK_pin)){
+    if(wait)
     while(io2.read(BACK_pin))update();
     return true;
   }else{
@@ -116,6 +121,55 @@ bool input::check_down(){
   
 }
 
+bool input::check_up(int timegap){
+  static long drop_delay=1000;
+  static bool flag=false;
+  long temp=millis();
+  if(io2.read(UP_pin)){
+    while(io2.read(UP_pin)&&(millis()-temp)<drop_delay)update();
+    if(!flag){
+      flag=true;
+      drop_delay=timegap;
+    }else{
+      if(drop_delay>5)
+      drop_delay-=5;
+      else
+      drop_delay=1;
+    }
+    return true;
+  }else{
+    drop_delay=1000;
+    flag=false;
+    return false;
+  }
+  
+}
+
+bool input::check_down(int timegap){
+  static long drop_delay=1000;
+  static bool flag=false;
+  long temp=millis();
+  if(io2.read(DOWN_pin)){
+    while(io2.read(DOWN_pin)&&(millis()-temp)<drop_delay)update();
+    if(!flag){
+      flag=true;
+      drop_delay=timegap;
+    }else{
+      if(drop_delay>5)
+      drop_delay-=5;
+      else
+      drop_delay=1;
+    }
+
+    return true;
+  }else{
+    drop_delay=1000;
+    flag=false;
+    return false;
+  }
+  
+}
+
 String input::read_pin(int n = 6) {
   String pin = "";
   while (true) {
@@ -123,18 +177,18 @@ String input::read_pin(int n = 6) {
     update();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        io1.write(j, (i == j) ? 0 : 1);
+        io1.write(keypad_pins[j], (i == j) ? 0 : 1);
       }
       
-      if (io1.readButton(4) == 0) {
-        while (io1.readButton(4) == 0) update();
+      if (io1.readButton(keypad_pins[4]) == 0) {
+        while (io1.readButton(keypad_pins[4]) == 0) update();
         if (i != 3) {
           n--;
           pin += (i * 3 + 1);
           disp.print("*");
         }
-      } else if (io1.readButton(5) == 0) {
-        while (io1.readButton(5) == 0) update();
+      } else if (io1.readButton(keypad_pins[5]) == 0) {
+        while (io1.readButton(keypad_pins[5]) == 0) update();
         n--;
         if (i == 3) {
           pin += 0;
@@ -143,8 +197,8 @@ String input::read_pin(int n = 6) {
           pin += (i * 3 + 2);
           disp.print("*");
         }
-      } else if (io1.readButton(6) == 0) {
-        while (io1.readButton(6) == 0) update();
+      } else if (io1.readButton(keypad_pins[6]) == 0) {
+        while (io1.readButton(keypad_pins[6]) == 0) update();
         if (i != 3) {
           n--;
           pin += (i * 3 + 3);
@@ -165,17 +219,17 @@ String input::read_number() {
     update();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        io1.write(j, (i == j) ? 0 : 1);
+        io1.write(keypad_pins[j], (i == j) ? 0 : 1);
       }
       
-      if (io1.readButton(4) == 0) {
-        while (io1.readButton(4) == 0) update();
+      if (io1.readButton(keypad_pins[4]) == 0) {
+        while (io1.readButton(keypad_pins[4]) == 0) update();
         if (i != 3) {
           pin += (i * 3 + 1);
           disp.print(String((i * 3 + 1)));
         }
-      } else if (io1.readButton(5) == 0) {
-        while (io1.readButton(5) == 0) update();
+      } else if (io1.readButton(keypad_pins[5]) == 0) {
+        while (io1.readButton(keypad_pins[5]) == 0) update();
         if (i == 3) {
           pin += 0;
           disp.print(String(0));
@@ -183,8 +237,8 @@ String input::read_number() {
           pin += (i * 3 + 2);
           disp.print(String((i * 3 + 2)));
         }
-      } else if (io1.readButton(6) == 0) {
-        while (io1.readButton(6) == 0) update();
+      } else if (io1.readButton(keypad_pins[6]) == 0) {
+        while (io1.readButton(keypad_pins[6]) == 0) update();
         if (i != 3) {
           pin += (i * 3 + 3);
           disp.print(String((i * 3 + 3)));
