@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Locker temp_locker;
 
     ListView device_list;
+    FloatingActionButton add_new_button;
 
     Userdata userdata = new Userdata();
     Functions functions = new Functions();
@@ -70,14 +72,21 @@ public class MainActivity extends AppCompatActivity {
 
     void init_view(){
         device_list=findViewById(R.id.device_listview);
+        add_new_button=findViewById(R.id.add_new_device_button);
     }
 
     void listeners(){
         device_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startActivity(new Intent(getApplicationContext(),MainActivity.class).putExtra("locker_data",gson.toJson(userdata.devices.get(i))));
+                startActivity(new Intent(getApplicationContext(),locker_activity.class).putExtra("locker_data",gson.toJson(userdata.devices.get(i))));
                 Toast.makeText(getApplicationContext(),"position:"+i,Toast.LENGTH_LONG).show();
+            }
+        });
+        add_new_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),add_device_activity.class));
             }
         });
     }

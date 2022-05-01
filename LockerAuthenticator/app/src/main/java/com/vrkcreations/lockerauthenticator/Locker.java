@@ -1,5 +1,8 @@
 package com.vrkcreations.lockerauthenticator;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Locker {
     private String Id="";
     private String Name="";
@@ -31,9 +34,11 @@ public class Locker {
     public void setTotp_base_hash(String totp_base_hash) {
         Totp_base_hash = totp_base_hash;
     }
-    public String getTOTP(int otp,int min,int hour,int date,int month,int year){
-        return functions.get_pin_from_hex(functions.SHA1(Totp_base_hash+":"+otp+":"+min+":"+hour+":"+date+":"+month+":"+year));
 
+
+    public String get_TOTP(String otp){
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("mm:HH:dd:MM:yyyy");
+        return functions.get_pin_from_hex(functions.SHA1(Totp_base_hash+":"+otp+simpleDateFormat.format(new Date())));
     }
 
 }

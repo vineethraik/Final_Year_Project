@@ -1,5 +1,7 @@
 package com.vrkcreations.lockerauthenticator;
 
+import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 public class Userdata {
     public final String shared_preferences_data_key = "User_data";
     public final String shared_preferences_key = "Offline_data";
+
 
     private boolean Registered =false;
     private boolean Idset=false;
