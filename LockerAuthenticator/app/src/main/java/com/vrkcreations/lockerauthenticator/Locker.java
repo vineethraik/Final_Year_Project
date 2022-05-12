@@ -14,6 +14,11 @@ public class Locker {
         Name = name;
         Totp_base_hash = totp_base_hash;
     }
+    public Locker() {
+        Id = "null";
+        Name = "nill";
+        Totp_base_hash = "nill";
+    }
 
     public String getId() {
         return Id;

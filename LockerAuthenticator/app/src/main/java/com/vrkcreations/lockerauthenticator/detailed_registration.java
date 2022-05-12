@@ -265,14 +265,20 @@ public class detailed_registration extends AppCompatActivity {
                     &&
                     Integer.toString(phone_otp).equals(phone_otp_edittext.getText().toString())
                 ){
-                    userdata.setName(name_edittext.getText().toString());
-                    userdata.setNickname(nickname_edittext.getText().toString());
-                    userdata.setPhone(phone_edittext.getText().toString());
-                    userdata.setEmail(email_edittext.getText().toString());
-                    userdata.setRegistered(true);
-                    saveofflinedata(userdata);
-                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
-                    finish();
+                    try {
+                        userdata.setName(name_edittext.getText().toString());
+                        userdata.setNickname(nickname_edittext.getText().toString());
+                        userdata.setPhone(phone_edittext.getText().toString());
+                        userdata.setEmail(email_edittext.getText().toString());
+                        userdata.setId(functions.SHA1(userdata.getPhone()).substring(0, 10));
+                        userdata.setRegistered(true);
+                        saveofflinedata(userdata);
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        finish();
+                    }catch (Exception e){
+                        Log.d("test","error:- "+e.getMessage());
+
+                    }
                 }else{
                     toast("Wrong otp",Toast.LENGTH_LONG);
                     phone_otp_edittext.setText("");
@@ -283,6 +289,7 @@ public class detailed_registration extends AppCompatActivity {
     }
 
     private void internet_request(String url, urlcode tag) {
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

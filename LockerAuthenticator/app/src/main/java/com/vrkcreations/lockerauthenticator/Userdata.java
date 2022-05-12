@@ -13,9 +13,9 @@ public class Userdata {
 
     private boolean Registered =false;
     private boolean Idset=false;
-    private String Id="";
-    private String Name="";
-    private String Nickname="";
+    private String Id="1B0A755DA9";
+    private String Name="temp";
+    private String Nickname="temp";
     private String Phone="0011001100";
     private String Email="vrk@temo.c";
 

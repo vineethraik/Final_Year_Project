@@ -33,7 +33,7 @@ class Locker{
   void init_Locker();
   struct{
     int initialized=-1;
-    String device_id="";
+    String device_id="tamo";
     String device_name="Locker_x";
     USER user[user_length];
   }data;
@@ -84,6 +84,8 @@ class Locker{
   void handle_test_pin();
   void handle_test_display();
   void handle_test_number();
+  void handle_test_util();
+
 
   private:         // server handlers
   static void handle_server_root();
@@ -143,6 +145,7 @@ void Locker::init_Locker(){
   temp.options.push_back(" Test pin ");
   temp.options.push_back(" Test display ");
   temp.options.push_back(" Test number ");
+  temp.options.push_back(" Test utility ");
   
   os.push_back(temp);
 }
@@ -262,7 +265,7 @@ void Locker::run_os(){
   }
 
   if(io.check_ok()){
-    if(os_state[0]!=4)
+    if(os_state[0]!=4&&os_state[0]!=5)
     reset_os_offset();
     if(os_state[0]==0){
       if(os_state[1]==0)handle_unlock();
@@ -293,6 +296,7 @@ void Locker::run_os(){
       if(os_state[1]==1)handle_test_pin();
       if(os_state[1]==2)handle_test_display();
       if(os_state[1]==3)handle_test_number();
+      if(os_state[1]==4)handle_test_util();
       
     }else{
       os_state[0]=0;
@@ -540,9 +544,24 @@ void Locker::handle_dev_unlock(){
 
 void Locker::handle_system_info(){
   disp.clear();
-  disp.println("currently \nunavailable");
+  int n=0;
+  for(int i=0;i<user_length;i++){
+    if(data.user[i].is_registered==1)
+    n++;
+  }
+  disp.println("No of users:"+n+"out of"+user_length);
+  for(int i=0,j=0,i<n;i++,j++){
+    while(data.user[j].is_registered!=1){
+      j++;
+    }
+    disp.println(i+"."+data.user[j].name);
+  }
+  disp.
   while(true){
     update();
+    
+
+
     if(io.check_back()){
       break;
     }
@@ -685,6 +704,35 @@ void Locker::handle_test_number(){
   }
 }
 
+void Locker::handle_test_util(){
+  while(true){
+    String s;
+    update();
+    disp.clear();
+    disp.print("string: ");
+    s=util.get_rand_string(5);
+    disp.println(s);
+    disp.print("hash: ");
+    s=util.get_hash(s);
+    disp.println(s);
+    disp.print("pin: ");
+    s=util.get_pin_from_hex(s);
+    disp.println(s);
+    int d=2000;
+    while(d--){
+      update();
+      delay(1);
+      if(io.check_back()){
+      disp.clear();
+      return;
+    }
+      if(io.check_ok()){
+      disp.clear();
+      break;
+    }
+    }
+  }
+}
 /////////////////////////////////////////////////////server handler functions
 
 void Locker::handle_server_root(){
@@ -704,6 +752,7 @@ void Locker::handle_server_add_user(){
     USER* usr=locker.get_nonregistered_user();
     if(usr==nullptr){
       server.send(200,"text/plain","no_user_space_free");
+      loop()
       return;
     }
     usr->id=temp;
@@ -741,10 +790,66 @@ void Locker::handle_server_add_user(){
       }
       usr->nickname=temp;
 
+      String r_str=util.get_rand_string();
+      disp.clear();
+      disp.println("Secret code:-");
+      disp.println(r_str,2);
+      usr->hash=util.get_hash(r_str);
+      disp.println("press OK to verify");
+      server.send(200,"text/plain","CODE_GENERATED");
       while(true){
-        update();
-        
+        locker.update();
+        delay(1);
+        if(io.check_back()){
+          disp.clear();
+          //server.send(200,"text/plain","process_interupted");
+          return;
+        }
+        if(io.check_ok()){
+          disp.clear();
+          break;
+        }
       }
+      reenter:
+      disp.clear();
+      disp.print("Enter the code:-");
+      String code=io.read_pin();
+      disp.clear();
+      disp.println("code:-\n"+code);
+      disp.print("press OK to confirm\npress BACK to reenter");
+
+      while(true){
+        locker.update();
+        delay(1);
+        if(io.check_back()){
+          disp.clear();
+          goto reenter;
+        }
+        if(io.check_ok()){
+          disp.clear();
+          disp.println("verifing passcode");
+          break;
+        }
+      }
+      if(code.equals(util.get_pin_from_hex(usr->hash))){
+        usr->is_registered=1;
+        //locker.writemem();
+        //server.send(200,"text/plain","registration_successfull");
+        disp.clear();
+        disp.println("Successfull");
+        disp.clear();
+        delay(AVGDELAY);
+        loop();
+        return;
+      }else{
+        disp.clear();
+        //server.send(200,"text/plain","registration_failed");
+        disp.println("Wrong code");
+        delay(AVGDELAY);
+        loop();
+        return;
+      }
+
     }
 
   }else{
@@ -757,14 +862,19 @@ void Locker::handle_server_get_info(){
   temp=server.arg("q");
   temp.toLowerCase();
   if(temp.equals("id")){
-    server.send(200,"text/plain",locker.get_id());
+    server.send(200,"text/plain",locker.data.device_id);
 
   }else if(temp.equals("time")){
     server.send(200,"text/plain",TIME.gettime());
   
   }else if(temp.equals("name")){
-    server.send(200,"text/plain",TIME.gettime());
+    server.send(200,"text/plain",locker.get_name());
   
+  }else if(temp.equals("is_registered")){
+    if(locker.get_user_with_id(server.arg("id"))->is_registered=1)
+    server.send(200,"text/plain","YES");
+    else
+    server.send(200,"text/plain","NO");
   }else{
     server.send(200,"text/plain","INVALID_ARGUMENT");
 

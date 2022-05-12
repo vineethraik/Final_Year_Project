@@ -1,7 +1,9 @@
 package com.vrkcreations.lockerauthenticator;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -83,6 +85,32 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"position:"+i,Toast.LENGTH_LONG).show();
             }
         });
+
+        device_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("test")
+                        .setMessage("delete locker")
+                        .setPositiveButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int j) {
+
+                            }
+                        })
+                        .setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int j) {
+                                userdata.devices.remove(i);
+                                saveofflinedata(userdata);
+                                startActivity(new Intent(getApplicationContext(),MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+                                finish();
+                            }
+                        }).show();
+                return true;
+            }
+        });
+
         add_new_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

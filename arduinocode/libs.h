@@ -51,6 +51,7 @@ class connectivity;
 class input;
 class time;
 class display;
+class utility;
 
 #ifndef locker_h
 #define locker_h
@@ -82,7 +83,7 @@ class display;
 #include"display.h"
 #endif
 
-#ifndef utlity_h
+#ifndef utility_h
 #define utility_h
 #include"utility.h"
 #endif

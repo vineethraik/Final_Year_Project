@@ -46,6 +46,7 @@ public class fingerprint_password extends AppCompatActivity {
     Button show_password_button;
     Button authenticate_button;
     Button control_button;
+    Button auth_flip_button;
     TextView secondary_password_indicator_textview;
     TextView primary_password_indicator_textview;
     TextView auth_type_textview;
@@ -249,14 +250,18 @@ public class fingerprint_password extends AppCompatActivity {
         findViewById(R.id.control_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SmsManager smsManager=SmsManager.getDefault();
-                smsManager.sendTextMessage("7337688347", null, "from a app", null, null);
+               // SmsManager smsManager=SmsManager.getDefault();
+              //  smsManager.sendTextMessage("7337688347", null, "from a app", null, null);
             }
         });
 
     }
 
     private void init() {
+        control_button.setVisibility(View.INVISIBLE);
+        auth_flip_button.setVisibility(View.INVISIBLE);
+
+
         sharedPreferences = getSharedPreferences(fingerprintActivityData.shared_preferences_key, MODE_PRIVATE);
         offline_data = sharedPreferences.edit();
 
@@ -280,6 +285,7 @@ public class fingerprint_password extends AppCompatActivity {
         authenticate_button = findViewById(R.id.authenticate_button);
         show_password_button = findViewById(R.id.show_password_button);
         control_button = findViewById(R.id.control_button);
+        auth_flip_button = findViewById(R.id.authflip_button);
         secondary_password_indicator_textview = findViewById(R.id.secondary_password_indicator_textview);
         primary_password_indicator_textview = findViewById(R.id.primary_password_indicator_textview);
         auth_type_textview = findViewById(R.id.password_mode_indicator_textview);
