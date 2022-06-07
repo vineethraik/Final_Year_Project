@@ -1,5 +1,7 @@
 package com.vrkcreations.lockerauthenticator;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -43,7 +45,9 @@ public class Locker {
 
     public String get_TOTP(String otp){
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("mm:HH:dd:MM:yyyy");
+        Log.d("test",Totp_base_hash+":"+otp+simpleDateFormat.format(new Date()));
         return functions.get_pin_from_hex(functions.SHA1(Totp_base_hash+":"+otp+simpleDateFormat.format(new Date())));
+
     }
 
 }
