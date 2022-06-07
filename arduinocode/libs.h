@@ -7,7 +7,7 @@
 
 #include <NTPClient.h>
 
-#include <sstream>
+//#include <sstream>
 
 //#include<vector>
 
@@ -17,23 +17,33 @@
 
 #include <Adafruit_SH110X.h>
 
+#include <Adafruit_SSD1306.h>
+
 #include <Hash.h>
 
 #include <EEPROM.h>
 
 #include <ESP8266WiFi.h>
 
+#include <ESP8266HTTPClient.h>
+
+#include <WiFiClientSecureBearSSL.h>
+
 #include <ESP8266WebServer.h>
 
-#include <WiFiManager.h>
+//#include <WiFiManager.h>
 
-#include <ESP8266mDNS.h>
+//#include <ESP8266mDNS.h>
 
-#include <WiFiUdp.h>
+//#include <WiFiUdp.h>
 
 #include <ArduinoOTA.h>
 
 #include <PCF8574.h>
+
+#include <UrlEncode.h>
+
+#include <Servo.h>
 
 #ifndef pcf8574_h
 #define pcf8574_h
@@ -44,14 +54,6 @@
 #include <RTC.h>
 #define RTC_h
 #endif
-
-class Locker ;
-class OTA;
-class connectivity;
-class input;
-class time;
-class display;
-class utility;
 
 #ifndef locker_h
 #define locker_h
@@ -98,6 +100,10 @@ class utility;
 #include"credentials.h"
 #endif
 
+#ifndef timer_h
+#define timer_h
+#include"timer.h"
+#endif
 
 
 using namespace std;
