@@ -4,6 +4,9 @@
 //#define maincode
 //#define RTCUPDATE
 //#define memory_init
+//#define search_device
+
+#define WEB_IO
 
 #ifdef maincode
 
