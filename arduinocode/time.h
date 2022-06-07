@@ -4,19 +4,20 @@
 WiFiUDP ntpUDP;
 static NTPClient timeClient(ntpUDP, "pool.ntp.org", 19800, 60000);
 
-    class Time
-           {
+class Time{
   private:
-  function<void(void)> update=nullptr;
-  DS1307 RTC;
+    function<void(void)> update=nullptr;
+    DS1307 RTC;
   
   public:
-  Time();
-  String gettime();
-  void print();
-  void update_time(int,int,int);
-  void update_date(int,int,int,int);
-  void addupdatefunction(function<void(void)>);
+    Time();
+    String gettime();
+    String get_formated_time();
+    String get_remainig_sec_from_next_min();
+    void print();
+    void update_time(int,int,int);
+    void update_date(int,int,int,int);
+    void addupdatefunction(function<void(void)>);
 }TIME;
 
 Time::Time(){
@@ -34,10 +35,29 @@ String Time::gettime(){
   return temp;
 }
 
+String Time::get_formated_time(){
+  char buff[25];
+  int hour=(RTC.getHours()<24)?RTC.getHours():0;
+  int minute=(RTC.getMinutes()<60)?RTC.getMinutes():0;
+  int day=(RTC.getDay()<32)?RTC.getDay():1;
+  int month=(RTC.getMonth()<13)?RTC.getMonth():1;
+  int year=(RTC.getYear()>2000)?RTC.getYear():0;
+
+  sprintf(buff,"%02d:%02d:%02d:%02d:%04d",minute,hour,day,month,year);
+  return String(buff);
+}
+
+String Time::get_remainig_sec_from_next_min(){
+  char buff[15];
+  sprintf(buff,"%2d Seconds left",60-RTC.getSeconds());
+  return String(buff);
+}
+
 void Time::print(){
   disp.clear();
   disp.refresh=false;
-  
+  char buff[100];
+  disp.println();
   switch (RTC.getWeek())
   {
     case 1:
@@ -62,20 +82,25 @@ void Time::print(){
       disp.print("SAT");
       break;
   }
-
-  disp.print(" ");
-  disp.print(String(RTC.getDay()));
-  disp.print("-");
-  disp.print(String(RTC.getMonth()));
-  disp.print("-");
-  disp.print(String(RTC.getYear()));
-  disp.println("",2);
-  disp.print(String(RTC.getHours()),2);
-  disp.print(":",2);
-  disp.print(String(RTC.getMinutes()),2);
-  disp.print(":",2);
+  sprintf(buff," %02d/%02d/%04d",RTC.getDay(),RTC.getMonth(),RTC.getYear());
+  //disp.print(" ");
+  //disp.print(String(RTC.getDay()));
+  //disp.print("/");
+  //disp.print(String(RTC.getMonth()));
+  //disp.print("/");
+  //disp.print(String(RTC.getYear()));
+  disp.println(String(buff));
+  disp.println("\n");
+  sprintf(buff," %02d:%02d:%02d",RTC.getHours(),RTC.getMinutes(),RTC.getSeconds());
+  //disp.print(String(RTC.getHours()),2);
+  //disp.print(":",2);
+  //disp.print(String(RTC.getMinutes()),2);
+  //disp.print(":",2);
+  //disp.refresh=true;
+  //disp.print(String(RTC.getSeconds()),2);
+  disp.print(String(buff),2);
   disp.refresh=true;
-  disp.print(String(RTC.getSeconds()),2);
+  disp.print();
 }
 
 void Time::update_time(int hour,int min,int sec){
