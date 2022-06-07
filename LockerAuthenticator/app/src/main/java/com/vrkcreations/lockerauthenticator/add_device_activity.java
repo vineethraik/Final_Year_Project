@@ -1,6 +1,7 @@
 package com.vrkcreations.lockerauthenticator;
 
 
+import androidx.annotation.Keep;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -29,7 +30,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 
-public class add_device_activity extends AppCompatActivity {
+@Keep public class add_device_activity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
 
@@ -69,7 +70,8 @@ public class add_device_activity extends AppCompatActivity {
         }
     }
 
-    private void init_volley() {
+
+    @Keep private void init_volley() {
         Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024);
         Network network = new BasicNetwork(new HurlStack());
         requestQueue = new RequestQueue(cache, network);
@@ -108,7 +110,7 @@ public class add_device_activity extends AppCompatActivity {
         });
     }
 
-    private void internet_request(String url,c_code tag){
+    @Keep private void internet_request(String url, c_code tag){
         Log.d("test","url:-"+url);
         StringRequest stringRequest=new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -130,12 +132,16 @@ public class add_device_activity extends AppCompatActivity {
                         internet_request("http://192.168.4.1/add-user?target=id&id="+userdata.getId(),c_code.ADD_ID);
                         break;
                     case ADD_ID:
+                        if(response.equals("no_user_space_free")){
+                            Toast.makeText(getApplicationContext(),"No extra user can be added to this Locker",Toast.LENGTH_LONG).show();
+                            finish();
+                        }else{
                         internet_request("http://192.168.4.1/add-user?target=user_info&id="+userdata.getId()
                                         +"&name="+userdata.getName()
                                         +"&email="+userdata.getEmail()
                                         +"&nickname="+userdata.getNickname()
                                         +"&phone="+userdata.getPhone(),
-                                c_code.REGISTER );
+                                c_code.REGISTER );}
                         break;
                     case REGISTER:
                         break;
@@ -165,7 +171,7 @@ public class add_device_activity extends AppCompatActivity {
                         Log.d("test","error fetching id"+error.getMessage());
                         break;
                     case NAME:
-                        Log.d("test","error fetching nome"+error.getMessage());
+                        Log.d("test","error fetching name"+error.getMessage());
                         break;
                     case REGISTER:
                         Log.d("test","error registering"+error.getMessage());
@@ -209,7 +215,10 @@ public class add_device_activity extends AppCompatActivity {
 
     private void register(){
 
-            locker.setTotp_base_hash(secret_code_edittext.getText().toString());
+            locker.setTotp_base_hash(functions.SHA1(secret_code_edittext.getText().toString()));
+            if(!display_name_edittext.getText().toString().equals("")){
+                locker.setName(display_name_edittext.getText().toString());
+            }
 
             new AlertDialog.Builder(this)
                     .setTitle("ADD DEVICE")
