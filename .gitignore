@@ -89,9 +89,9 @@ lint/tmp/
 
 # Arduino custom gitignore
 credentials.h
-experiment.ino
+
 bitmaps.h
-codedump.ino
+
 
 
 #vscode
