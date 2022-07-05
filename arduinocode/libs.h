@@ -11,7 +11,7 @@
 
 //#include<vector>
 
-#include <SPI.h>
+//#include <SPI.h>
 
 #include <Wire.h>
 
@@ -57,52 +57,52 @@
 
 #ifndef locker_h
 #define locker_h
-#include"locker.h"
+#include "locker.h"
 #endif
 
 #ifndef OTA_h
 #define OTA_h
-#include"OTA.h"
-#endif 
+#include "OTA.h"
+#endif
 
 #ifndef connectivity_h
 #define connectivity_h
-#include"connectivity.h"
+#include "connectivity.h"
 #endif
 
 #ifndef input_h
 #define input_h
-#include"input.h"
+#include "input.h"
 #endif
 
 #ifndef time_h
 #define time_h
-#include"time.h"
+#include "time.h"
 #endif
 
 #ifndef display_h
 #define display_h
-#include"display.h"
+#include "display.h"
 #endif
 
 #ifndef utility_h
 #define utility_h
-#include"utility.h"
+#include "utility.h"
 #endif
 
 #ifndef bitmaps_h
 #define bitmaps_h
-#include"bitmaps.h"
+#include "bitmaps.h"
 #endif
 
 #ifndef credentials_h
 #define credentials_h
-#include"credentials.h"
+#include "credentials.h"
 #endif
 
 #ifndef timer_h
 #define timer_h
-#include"timer.h"
+#include "timer.h"
 #endif
 
 

@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdk 31
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.vrkcreations.lockerauthenticator"

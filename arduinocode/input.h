@@ -11,15 +11,15 @@ class input;
 #define UP_pin 1
 #define DOWN_pin 3
 
-const int keypad_pins[7]{6,5,4,3,2,1,0};
+const int keypad_pins[7]{ 6, 5, 4, 3, 2, 1, 0 };
 
 class input {
-  private:
+private:
   function<void(void)> update = nullptr;
   PCF8574 io1;
   PCF8574 io2;
 
-  public:
+public:
   input();
   input(char, char);
   enum state { BACK,
@@ -39,15 +39,15 @@ class input {
   String read_number(int);
   void addupdatefunction(function<void(void)>);
 
-  #ifdef WEB_IO
-  public:
-    bool web_number_present=false;
-    bool web_button_present=false;
-    char web_number='\0';
-    state web_button=NILL;
-  #endif
-  
-}io;
+#ifdef WEB_IO
+public:
+  bool web_number_present = false;
+  bool web_button_present = false;
+  char web_number = '\0';
+  state web_button = NILL;
+#endif
+
+} io;
 
 input::input(char adr1, char adr2) {
   io1.setAddress(adr1);
@@ -69,21 +69,25 @@ input::state input::read_switch() {
     update();
 
     if (io2.read(DOWN_pin)) {
-      while(io2.read(DOWN_pin))update();
+      while (io2.read(DOWN_pin)) update();
       return DOWN;
     } else if (io2.read(BACK_pin)) {
-      while(io2.read(BACK_pin))update();
+      while (io2.read(BACK_pin)) update();
       return BACK;
     } else if (io2.read(OK_pin)) {
-      while(io2.read(OK_pin))update();
+      while (io2.read(OK_pin)) update();
       return OK;
     } else if (io2.read(UP_pin)) {
-      while(io2.read(UP_pin))update();
+      while (io2.read(UP_pin)) update();
       return UP;
-    } else if (web_button_present) {
-      web_button_present=false;
+    }
+#ifdef WEB_IO
+    else if (web_button_present) {
+      web_button_present = false;
       return web_button;
-    } else {
+    }
+#endif
+    else {
       if (timeout > 0) {
         timeout--;
         delay(1);
@@ -94,126 +98,121 @@ input::state input::read_switch() {
   }
 }
 
-bool input::check_back(bool wait=true){
-  if(io2.read(BACK_pin)){
-    if(wait)
-      while(io2.read(BACK_pin))update();
+bool input::check_back(bool wait = true) {
+  if (io2.read(BACK_pin)) {
+    if (wait)
+      while (io2.read(BACK_pin)) update();
     return true;
   }
-  #ifdef WEB_IO
-  if(web_button_present){
-    if(web_button==BACK){
-      web_button_present=false;
+#ifdef WEB_IO
+  if (web_button_present) {
+    if (web_button == BACK) {
+      web_button_present = false;
       return true;
     }
   }
-  #endif
-  
+#endif
+
   return false;
-  
 }
 
-bool input::check_ok(){
-  if(io2.read(OK_pin)){
-    while(io2.read(OK_pin))update();
+bool input::check_ok() {
+  if (io2.read(OK_pin)) {
+    while (io2.read(OK_pin)) update();
     return true;
   }
-  #ifdef WEB_IO
-  if(web_button_present){
-    if(web_button==OK){
-      web_button_present=false;
+#ifdef WEB_IO
+  if (web_button_present) {
+    if (web_button == OK) {
+      web_button_present = false;
       return true;
     }
   }
-  #endif
-  
+#endif
+
   return false;
-  
 }
 
-bool input::check_up(){
-  if(io2.read(UP_pin)){
-    while(io2.read(UP_pin))update();
+bool input::check_up() {
+  if (io2.read(UP_pin)) {
+    while (io2.read(UP_pin)) update();
     return true;
   }
-  
-  #ifdef WEB_IO
-  if(web_button_present){
-    if(web_button==UP){
-      web_button_present=false;
+
+#ifdef WEB_IO
+  if (web_button_present) {
+    if (web_button == UP) {
+      web_button_present = false;
       return true;
     }
   }
-  #endif
-  
+#endif
+
   return false;
-  
 }
 
-bool input::check_down(){
-  if(io2.read(DOWN_pin)){
-    while(io2.read(DOWN_pin))update();
+bool input::check_down() {
+  if (io2.read(DOWN_pin)) {
+    while (io2.read(DOWN_pin)) update();
     return true;
   }
-  #ifdef WEB_IO
-  if(web_button_present){
-    if(web_button==DOWN){
-      web_button_present=false;
+#ifdef WEB_IO
+  if (web_button_present) {
+    if (web_button == DOWN) {
+      web_button_present = false;
       return true;
     }
   }
-  #endif
-  
+#endif
+
   return false;
 }
 
-bool input::check_up(int timegap){
-  static unsigned int drop_delay=1000;
-  static bool flag=false;
-  unsigned long temp=millis();
-  if(io2.read(UP_pin)){
-    while(io2.read(UP_pin)&&(millis()-temp)<drop_delay)update();
-    if(!flag){
-      flag=true;
-      drop_delay=timegap;
-    }else{
-      if(drop_delay>5)
-      drop_delay-=5;
+bool input::check_up(int timegap) {
+  static unsigned int drop_delay = 1000;
+  static bool flag = false;
+  unsigned long temp = millis();
+  if (io2.read(UP_pin)) {
+    while (io2.read(UP_pin) && (millis() - temp) < drop_delay) update();
+    if (!flag) {
+      flag = true;
+      drop_delay = timegap;
+    } else {
+      if (drop_delay > 5)
+        drop_delay -= 5;
       else
-      drop_delay=1;
+        drop_delay = 1;
     }
     return true;
-  }else{
-    drop_delay=1000;
-    flag=false;
+  } else {
+    drop_delay = 1000;
+    flag = false;
     return false;
   }
-  
 }
 
-bool input::check_down(int timegap){
-  static unsigned int drop_delay=1000;
-  static bool flag=false;
-  unsigned long temp=millis();
-  if(io2.read(DOWN_pin)){
-    while(io2.read(DOWN_pin)&&(millis()-temp)<drop_delay)update();
-    if(!flag){
-      flag=true;
-      drop_delay=timegap;
-    }else{
-      if(drop_delay>5)
-      drop_delay-=5;
+bool input::check_down(int timegap) {
+  static unsigned int drop_delay = 1000;
+  static bool flag = false;
+  unsigned long temp = millis();
+  if (io2.read(DOWN_pin)) {
+    while (io2.read(DOWN_pin) && (millis() - temp) < drop_delay) update();
+    if (!flag) {
+      flag = true;
+      drop_delay = timegap;
+    } else {
+      if (drop_delay > 5)
+        drop_delay -= 5;
       else
-      drop_delay=1;
+        drop_delay = 1;
     }
 
     return true;
-  }else{
-    drop_delay=1000;
-    flag=false;
+  } else {
+    drop_delay = 1000;
+    flag = false;
     return false;
   }
-  
 }
 
 String input::read_pin(int n = 6) {
@@ -223,24 +222,24 @@ String input::read_pin(int n = 6) {
     update();
 
     if (n < 1) break;
-    if (check_back())return "nill";
+    if (check_back()) return "nill";
 
-    #ifdef WEB_IO
-    if(web_number_present){
-      pin+=web_number;
+#ifdef WEB_IO
+    if (web_number_present) {
+      pin += web_number;
       n--;
       disp.print("*");
-      web_number_present=false;
+      web_number_present = false;
       continue;
     }
-    #endif
+#endif
 
-    #ifndef IO_INVALID
+#ifndef IO_INVALID
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         io1.write(keypad_pins[j], (i == j) ? 0 : 1);
       }
-      
+
       if (io1.readButton(keypad_pins[4]) == 0) {
         while (io1.readButton(keypad_pins[4]) == 0) update();
         if (i != 3) {
@@ -271,24 +270,24 @@ String input::read_pin(int n = 6) {
         }
       }
     }
-    #endif
+#endif
   }
   return pin;
 }
 
-String input::read_number(int n=-1) {
+String input::read_number(int n = -1) {
   String pin = "";
-  bool limited=true;
-  if(n==-1)limited=false;
+  bool limited = true;
+  if (n == -1) limited = false;
   while (true) {
     delay(1);
     update();
-    #ifndef IO_INVALID
+#ifndef IO_INVALID
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         io1.write(keypad_pins[j], (i == j) ? 0 : 1);
       }
-      
+
       if (io1.readButton(keypad_pins[4]) == 0) {
         while (io1.readButton(keypad_pins[4]) == 0) update();
         if (i != 3) {
@@ -315,34 +314,32 @@ String input::read_number(int n=-1) {
         }
       }
     }
-    #endif
-    if(limited){
-      if(n<1){
-        delay(AVGDELAY/2);
+#endif
+    if (limited) {
+      if (n < 1) {
+        delay(AVGDELAY / 2);
         return pin;
-        
       }
     }
-    if (check_back())return "nill";
-    if(check_ok())break;
+    if (check_back()) return "nill";
+    if (check_ok()) break;
 
-    //#ifdef WEB_IO
-    if(web_number_present){
-      web_number_present=false;
-      pin+=web_number;
+#ifdef WEB_IO
+    if (web_number_present) {
+      web_number_present = false;
+      pin += web_number;
       n--;
       disp.print(String(web_number));
     }
-
-    if(limited){
-      if(n<1){
-        delay(AVGDELAY/2);
+#endif
+    if (limited) {
+      if (n < 1) {
+        delay(AVGDELAY / 2);
         return pin;
-        
       }
     }
-    if (check_back())return "nill";
-    if(check_ok())break;
+    if (check_back()) return "nill";
+    if (check_ok()) break;
     //#endif
   }
   return pin;
@@ -351,4 +348,3 @@ String input::read_number(int n=-1) {
 void input::addupdatefunction(function<void(void)> fn) {
   update = fn;
 }
-

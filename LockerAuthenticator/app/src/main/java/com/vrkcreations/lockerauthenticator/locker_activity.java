@@ -130,4 +130,11 @@ public class locker_activity extends AppCompatActivity {
         super.onDestroy();
         timer.cancel();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+       // startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        finish();
+    }
 }

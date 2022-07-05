@@ -2,12 +2,10 @@
 
 #include "libs.h"
 
-void setup(){
-
+void setup() {
 }
 
-void loop(){
-  
+void loop() {
 }
 
 
